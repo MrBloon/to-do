@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { NewTodoForm } from "./components/NewTodoForm"
 import { TodoList } from "./components/TodoList"
 import { Todo } from './types'
+import { getTodos, createTodo, updateTodo, deleteTodo } from './mocks/api'
 import "./styles.css"
 
 function App() {
@@ -11,28 +12,18 @@ function App() {
 
   const { isLoading, isError, data, error } = useQuery({ 
     queryKey: ['todos'],
-    queryFn: () => fetch('/todos').then((res) => res.json()),
+    queryFn: getTodos,
   })
 
   const newTodoMutation = useMutation({
-    mutationFn: (newTodo: Todo) => fetch('/todos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newTodo),
-    }).then((res) => res.json()),
+    mutationFn: createTodo,
     onSuccess: () => {
       queryClient.invalidateQueries(["todos"])
     }
   })
 
   const updateTodoMutation = useMutation({
-    mutationFn: ({id, completed}: {id: string, completed: boolean}) => fetch(`/todos/${id}`, { 
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(completed),
-     }).then((res) => res.json()),
+    mutationFn: updateTodo,
     onSuccess: () => {
       queryClient.invalidateQueries(["todos"])
     }
