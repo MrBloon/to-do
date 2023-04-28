@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import React from 'react'
 import App from './App'
 
-if (process.env.NODE_ENV == 'development') {
+if (process.env.NODE_ENV === 'development') {
   require('./mocks/browser')
 }
 

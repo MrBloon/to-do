@@ -24,7 +24,7 @@ export function updateTodo({id, completed}: {id: string, completed: boolean}) {
        .then((res) => res.json())
 }
 
-export function deleteTodo(id: string) {
+export function removeTodo(id: string) {
     return fetch(`/todos/${id}`, { 
     method: 'DELETE' })
     .then((res) => res.json())

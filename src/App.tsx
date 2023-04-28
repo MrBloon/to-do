@@ -3,8 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { NewTodoForm } from "./components/NewTodoForm"
 import { TodoList } from "./components/TodoList"
-import { Todo } from './types'
-import { getTodos, createTodo, updateTodo, deleteTodo } from './mocks/api'
+import { getTodos, createTodo, updateTodo, removeTodo } from './mocks/api'
 import "./styles.css"
 
 function App() {
@@ -30,9 +29,7 @@ function App() {
   })
 
   const deleteTodoMutation = useMutation({
-    mutationFn: (id: string) => fetch(`/todos/${id}`, 
-    { method: 'DELETE' })
-    .then((res) => res.json()),
+    mutationFn: removeTodo,
     onSuccess: () => {
       queryClient.invalidateQueries(["todos"])
     } 
