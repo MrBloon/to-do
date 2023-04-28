@@ -12,37 +12,37 @@ function App() {
 
   const { isLoading, isError, data, error } = useQuery({ 
     queryKey: ['todos'],
-    queryFn: () => [...state.todos],
+    queryFn: () => fetch('/todos').then((res) => res.json()),
   })
 
   const newTodoMutation = useMutation({
-    mutationFn: async (newTodo: Todo) => {
-      state.todos.push(newTodo)
-    },
+    mutationFn: (newTodo: Todo) => fetch('/todos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newTodo),
+    }).then((res) => res.json()),
     onSuccess: () => {
       queryClient.invalidateQueries(["todos"])
     }
   })
 
   const updateTodoMutation = useMutation({
-    mutationFn: async ({id, completed}: {id: string, completed: boolean}) => {
-      state.todos = state.todos.map(todo => {
-        if (todo.id === id) {
-          return {...todo, completed}
-        } else {
-          return todo
-        }
-      })
-    },
+    mutationFn: ({id, completed}: {id: string, completed: boolean}) => fetch(`/todos/${id}`, { 
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(completed),
+     }).then((res) => res.json()),
     onSuccess: () => {
       queryClient.invalidateQueries(["todos"])
     }
   })
 
   const deleteTodoMutation = useMutation({
-    mutationFn: async (id: string) => {
-      state.todos = state.todos.filter(todo => todo.id !== id)
-    },
+    mutationFn: (id: string) => fetch(`/todos/${id}`, 
+    { method: 'DELETE' })
+    .then((res) => res.json()),
     onSuccess: () => {
       queryClient.invalidateQueries(["todos"])
     } 
