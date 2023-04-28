@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { NewTodoForm } from "./components/NewTodoForm"
 import { TodoList } from "./components/TodoList"
-import { state } from './initialTodos'
 import { Todo } from './types'
 import "./styles.css"
 
