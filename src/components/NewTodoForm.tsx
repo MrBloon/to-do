@@ -1,12 +1,6 @@
 import { useForm, SubmitHandler } from "react-hook-form"
 
-interface TodoFormProps {
-    addTodo: (title: string) => void
-}
-
-type FormValues = {
-    item: string;
-}
+import { TodoFormProps, FormValues } from '../types'
 
 export function NewTodoForm({ addTodo }: TodoFormProps) {
     const {

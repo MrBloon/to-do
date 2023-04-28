@@ -1,10 +1,4 @@
-interface TodoItemProps {
-    id: string;
-    completed: boolean;
-    title: string;
-    toggleTodo: (id: string, completed: boolean) => void;
-    deleteTodo: (id: string) => void;
-}
+import { TodoItemProps } from '../types'
 
 export function TodoItem({ completed, id, title, toggleTodo, deleteTodo }: TodoItemProps) {
     return (

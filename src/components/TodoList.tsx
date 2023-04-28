@@ -1,16 +1,5 @@
 import { TodoItem } from "./TodoItem"
-
-interface Todo {
-    id: string;
-    title: string;
-    completed: boolean;
-}
-
-interface TodoListProps {
-    todos: Todo[];
-    toggleTodo: (id: string, completed: boolean) => void;
-    deleteTodo: (id: string) => void;
-}
+import { TodoListProps } from '../types'
 
 export function TodoList({ todos, toggleTodo, deleteTodo }: TodoListProps) {
   return (

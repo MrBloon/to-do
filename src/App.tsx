@@ -1,58 +1,84 @@
-import { useEffect, useState } from "react"
-import { NewTodoForm } from "./NewTodoForm"
-import { TodoList } from "./TodoList"
 import { v4 as uuidv4 } from 'uuid'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+
+import { NewTodoForm } from "./components/NewTodoForm"
+import { TodoList } from "./components/TodoList"
+import { state } from './initialTodos'
+import { Todo } from './types'
 import "./styles.css"
 
-interface Todo {
-  id: string
-  title: string
-  completed: boolean
-}
-
 function App() {
-  const [todos, setTodos] = useState(() => {
-    const localValue = localStorage.getItem("ITEMS")
-    if (localValue == null) return []
+  const queryClient = useQueryClient()
 
-    return JSON.parse(localValue)
+  const { isLoading, isError, data, error } = useQuery({ 
+    queryKey: ['todos'],
+    queryFn: () => [...state.todos],
   })
 
-  useEffect(() => {
-    localStorage.setItem("ITEMS", JSON.stringify(todos))
-  }, [todos])
+  const newTodoMutation = useMutation({
+    mutationFn: async (newTodo: Todo) => {
+      state.todos.push(newTodo)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["todos"])
+    }
+  })
+
+  const updateTodoMutation = useMutation({
+    mutationFn: async ({id, completed}: {id: string, completed: boolean}) => {
+      state.todos = state.todos.map(todo => {
+        if (todo.id === id) {
+          return {...todo, completed}
+        } else {
+          return todo
+        }
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["todos"])
+    }
+  })
+
+  const deleteTodoMutation = useMutation({
+    mutationFn: async (id: string) => {
+      state.todos = state.todos.filter(todo => todo.id !== id)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["todos"])
+    } 
+  })
 
   const addTodo = (title: string) => {
-    setTodos((currentTodos: Todo[]) => {
-      return [
-        ...currentTodos, 
-        {id: uuidv4(), title, completed: false}]
-    })
-  }
-
-  const toggleTodo = (id: string, completed: boolean) => {
-    setTodos((currentTodos: Todo[]) => {
-      return currentTodos.map(todo => {
-        if (todo.id === id) {
-          return { ...todo, completed }
-        }
-
-        return todo
-      })
-    })
+    newTodoMutation.mutate({id: uuidv4(), title, completed: false})
   }
 
   const deleteTodo = (id: string) => {
-    setTodos((currentTodos: Todo[]) => {
-      return currentTodos.filter(todo => todo.id !== id)
-    })
+    deleteTodoMutation.mutate(id)
+  }
+  
+  const toggleTodo = (id: string, completed: boolean) => {
+    updateTodoMutation.mutate({id, completed})
+  }
+
+
+  if (isLoading) {
+    return <span>Loading...</span>
+  }
+
+  if (isError) {
+    // @ts-ignore
+    return <span>Error: {error.message}</span>
+  }
+  
+  if (!data) {
+    return <span>NO DATA</span>
   }
 
   return (
     <>
       <NewTodoForm addTodo={addTodo}/>
       <h1 className="header">Todo list</h1>
-      <TodoList todos={todos} toggleTodo={toggleTodo} deleteTodo={deleteTodo}/>
+      <TodoList todos={data} toggleTodo={toggleTodo} deleteTodo={deleteTodo}/>
     </>
   );
 }
